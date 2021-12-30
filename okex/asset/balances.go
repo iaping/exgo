@@ -5,10 +5,14 @@ import "github.com/iaping/exgo/okex"
 const BalancesRequestPath = "/api/v5/asset/balances"
 
 type BalancesRequest struct {
-	Ccy string
+	Ccy string `json:"ccy"`
 }
 
-func (br *BalancesRequest) RequestPath() string {
+func NewBalancesRequest(ccy string) *BalancesRequest {
+	return &BalancesRequest{Ccy: ccy}
+}
+
+func (br *BalancesRequest) Path() string {
 	return BalancesRequestPath
 }
 

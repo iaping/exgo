@@ -1,6 +1,6 @@
 package okex
 
 type Request interface {
-	RequestPath() string
+	Path() string
 	Method() string
 }

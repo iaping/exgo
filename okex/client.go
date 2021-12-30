@@ -25,7 +25,8 @@ func NewClient(conf *Config) *Client {
 	}
 }
 
-func (c *Client) Do(api *Request) (*fasthttp.Request, *fasthttp.Response, error) {
+// request okex api
+func (c *Client) Do(api Request) ([]byte, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer func() {
@@ -33,15 +34,15 @@ func (c *Client) Do(api *Request) (*fasthttp.Request, *fasthttp.Response, error)
 		fasthttp.ReleaseResponse(resp)
 	}()
 
-	//req.Header.SetMethod()
+	req.Header.SetMethod(api.Method())
 	c.setMustHeaders(req)
 	if err := c.Request.Do(req, resp); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if resp.StatusCode() != fasthttp.StatusOK {
-		return nil, nil, fmt.Errorf("error http status code: %d", resp.StatusCode())
+		return nil, fmt.Errorf("error http status code: %d", resp.StatusCode())
 	}
-	return req, resp, nil
+	return resp.Body(), nil
 }
 
 // okex must set headers
