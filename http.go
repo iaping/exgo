@@ -6,6 +6,11 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+const (
+	HeaderContentTypeJson = "application/json;charset=utf-8"
+	HeaderAcceptJson      = "application/json"
+)
+
 var (
 	FastHttpClient = &fasthttp.Client{
 		Name:                "exgo",
