@@ -9,6 +9,8 @@ import (
 const (
 	HeaderContentTypeJson = "application/json;charset=utf-8"
 	HeaderAcceptJson      = "application/json"
+	HeaderMethodGet       = "GET"
+	HeaderMethodPost      = "POST"
 )
 
 var (
