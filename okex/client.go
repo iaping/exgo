@@ -51,9 +51,8 @@ func (c *Client) doRequest(r api.Request) ([]byte, error) {
 		fasthttp.ReleaseRequest(req)
 		fasthttp.ReleaseResponse(resp)
 	}()
-	if err := c.setNecessary(req, r); err != nil {
-		return nil, err
-	}
+
+	c.setNecessary(req, r)
 	if err := c.Request.Do(req, resp); err != nil {
 		return nil, err
 	}
@@ -64,7 +63,7 @@ func (c *Client) doRequest(r api.Request) ([]byte, error) {
 }
 
 // okex necessary set
-func (c *Client) setNecessary(req *fasthttp.Request, r api.Request) error {
+func (c *Client) setNecessary(req *fasthttp.Request, r api.Request) {
 	signature := c.signature(r)
 	necessaries := map[string]string{
 		fasthttp.HeaderContentType: exgo.HeaderContentTypeJson,
@@ -80,10 +79,10 @@ func (c *Client) setNecessary(req *fasthttp.Request, r api.Request) error {
 	for k, v := range necessaries {
 		req.Header.Set(k, v)
 	}
+
 	req.Header.SetMethod(r.Method())
 	req.SetBodyString(signature.Body)
 	req.SetRequestURI(c.Host + signature.Path)
-	return nil
 }
 
 // signature Request
