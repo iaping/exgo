@@ -7,10 +7,8 @@ import (
 )
 
 // hmac sha256
-func HmacSHA256(data, key []byte) (string, error) {
+func HmacSHA256(data, key []byte) string {
 	hash := hmac.New(sha256.New, key)
-	if _, err := hash.Write(data); err != nil {
-		return "", err
-	}
-	return base64.StdEncoding.EncodeToString(hash.Sum(nil)), nil
+	hash.Write(data)
+	return base64.StdEncoding.EncodeToString(hash.Sum(nil))
 }

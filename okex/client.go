@@ -3,11 +3,11 @@ package okex
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 
+	"github.com/google/go-querystring/query"
 	"github.com/iaping/exgo"
 	"github.com/iaping/exgo/okex/api"
-	"github.com/iaping/exgo/okex/api/account"
-	"github.com/iaping/exgo/okex/api/asset"
 	"github.com/valyala/fasthttp"
 )
 
@@ -31,7 +31,7 @@ func NewClient(conf *Config) *Client {
 
 // request okex api
 func (c *Client) Do(req api.Request, resp api.Response) error {
-	data, err := c.do(req)
+	data, err := c.doRequest(req)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (c *Client) Do(req api.Request, resp api.Response) error {
 }
 
 // request okex api
-func (c *Client) do(r api.Request) ([]byte, error) {
+func (c *Client) doRequest(r api.Request) ([]byte, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer func() {
@@ -66,18 +66,14 @@ func (c *Client) do(r api.Request) ([]byte, error) {
 
 // okex necessary set
 func (c *Client) setNecessary(req *fasthttp.Request, r api.Request) error {
-	sign := c.signature(r)
-	signature, err := sign.String()
-	if err != nil {
-		return err
-	}
+	signature := c.signature(r)
 	necessaries := map[string]string{
 		fasthttp.HeaderContentType: exgo.HeaderContentTypeJson,
 		fasthttp.HeaderAccept:      exgo.HeaderAcceptJson,
 		HeaderAccessKey:            c.Config.APIKey,
 		HeaderAccessPassphrase:     c.Config.Passphrase,
-		HeaderAccessTimestamp:      sign.Timestamp,
-		HeaderAccessSign:           signature,
+		HeaderAccessSign:           signature.Build(),
+		HeaderAccessTimestamp:      signature.Timestamp,
 	}
 	if c.Config.Simulated {
 		necessaries[HeaderSimulatedTrading] = "1"
@@ -86,31 +82,35 @@ func (c *Client) setNecessary(req *fasthttp.Request, r api.Request) error {
 		req.Header.Set(k, v)
 	}
 	req.Header.SetMethod(r.Method())
-	req.SetRequestURI(c.Host + r.Path())
-	req.SetBodyString(sign.Body)
+	req.SetBodyString(signature.Body)
+	req.SetRequestURI(c.Host + signature.Path)
 	return nil
 }
 
 // signature Request
 func (c *Client) signature(r api.Request) *api.Signature {
-	body, _ := json.Marshal(r)
-	return api.NewSignature(c.Config.SecretKey, r.Method(), r.Path(), string(body))
+	path := r.Path()
+	body := []byte("")
+	if c.isPost(r) {
+		body, _ = c.buildBody(r)
+	} else {
+		q, _ := c.buildQuery(r)
+		path += "?" + q.Encode()
+	}
+	return api.NewSignature(c.Config.SecretKey, r.Method(), path, string(body))
 }
 
-func (c *Client) Currencies() ([]*asset.Currencies, error) {
-	req := asset.NewCurrenciesRequest()
-	var resp asset.CurrenciesResponse
-	if err := c.Do(req, &resp); err != nil {
-		return nil, err
-	}
-	return resp.Data, nil
+// build request body
+func (c *Client) buildBody(r api.Request) ([]byte, error) {
+	return json.Marshal(r)
 }
 
-func (c *Client) Balance(ccy string) ([]*account.Balance, error) {
-	req := account.NewBalanceRequest(ccy)
-	var resp account.BalanceResponse
-	if err := c.Do(req, &resp); err != nil {
-		return nil, err
-	}
-	return resp.Data, nil
+// build request uri query
+func (c *Client) buildQuery(r api.Request) (url.Values, error) {
+	return query.Values(r)
+}
+
+// is post request
+func (c *Client) isPost(r api.Request) bool {
+	return r.Method() == "POST"
 }

@@ -20,15 +20,15 @@ func NewSignature(key, method, path, body string) *Signature {
 }
 
 // The Base64-encoded signature (see Signing Messages subsection for details).
-func (s *Signature) String() (string, error) {
+func (s *Signature) Build() string {
 	if s.Timestamp == "" {
-		s.timestamp()
+		s.setTimestamp()
 	}
 	data := s.Timestamp + s.Method + s.Path + s.Body
 	return exgo.HmacSHA256([]byte(data), []byte(s.Key))
 }
 
 // The timestamp of your request.e.g : 2020-12-08T09:08:57.715Z
-func (s *Signature) timestamp() {
+func (s *Signature) setTimestamp() {
 	s.Timestamp = time.Now().UTC().Format(time.RFC3339)
 }
