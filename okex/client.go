@@ -87,7 +87,7 @@ func (c *Client) setNecessary(req *fasthttp.Request, r api.Request) error {
 }
 
 // signature Request
-func (c *Client) signature(r api.Request) *api.Signature {
+func (c *Client) signature(r api.Request) *Signature {
 	path := r.Path()
 	body := []byte("")
 	if c.isPost(r) {
@@ -96,7 +96,7 @@ func (c *Client) signature(r api.Request) *api.Signature {
 		q, _ := query.Values(r)
 		path += "?" + q.Encode()
 	}
-	return api.NewSignature(c.Config.SecretKey, r.Method(), path, string(body))
+	return NewSignature(c.Config.SecretKey, r.Method(), path, string(body))
 }
 
 // is post request
