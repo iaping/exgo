@@ -3,7 +3,6 @@ package okex
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 
 	"github.com/google/go-querystring/query"
 	"github.com/iaping/exgo"
@@ -92,22 +91,12 @@ func (c *Client) signature(r api.Request) *api.Signature {
 	path := r.Path()
 	body := []byte("")
 	if c.isPost(r) {
-		body, _ = c.buildBody(r)
+		body, _ = json.Marshal(r)
 	} else {
-		q, _ := c.buildQuery(r)
+		q, _ := query.Values(r)
 		path += "?" + q.Encode()
 	}
 	return api.NewSignature(c.Config.SecretKey, r.Method(), path, string(body))
-}
-
-// build request body
-func (c *Client) buildBody(r api.Request) ([]byte, error) {
-	return json.Marshal(r)
-}
-
-// build request uri query
-func (c *Client) buildQuery(r api.Request) (url.Values, error) {
-	return query.Values(r)
 }
 
 // is post request
