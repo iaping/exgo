@@ -93,7 +93,9 @@ func (c *Client) signature(r api.Request) *Signature {
 		body, _ = json.Marshal(r)
 	} else {
 		q, _ := query.Values(r)
-		path += "?" + q.Encode()
+		if len(q) > 0 {
+			path += "?" + q.Encode()
+		}
 	}
 	return NewSignature(c.Config.SecretKey, r.Method(), path, string(body))
 }

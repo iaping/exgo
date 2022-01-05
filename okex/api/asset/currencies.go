@@ -27,14 +27,14 @@ type CurrenciesResponse struct {
 }
 
 type Currencies struct {
-	Ccy         string `json:"ccy"`
-	Chain       string `json:"chain"`
-	Name        string `json:"name"`
-	CanDep      bool   `json:"canDep"`
-	CanWd       bool   `json:"canWd"`
-	CanInternal bool   `json:"canInternal"`
-	MinWd       string `json:"minWd"`
-	MaxFee      string `json:"maxFee"`
-	MinFee      string `json:"minFee"`
-	MainNet     bool   `json:"mainNet"`
+	Ccy         string  `json:"ccy"`
+	Chain       string  `json:"chain"`
+	Name        string  `json:"name"`
+	CanDep      bool    `json:"canDep"`
+	CanWd       bool    `json:"canWd"`
+	CanInternal bool    `json:"canInternal"`
+	MinWd       float64 `json:"minWd,string"`
+	MaxFee      float64 `json:"maxFee,string"`
+	MinFee      float64 `json:"minFee,string"`
+	MainNet     bool    `json:"mainNet"`
 }
