@@ -20,6 +20,15 @@ type Client struct {
 	Request *fasthttp.Client
 }
 
+func New(apiKey, secretKey, passphrase string, simulated bool) *Client {
+	return NewClient(&Config{
+		APIKey:     apiKey,
+		SecretKey:  secretKey,
+		Passphrase: passphrase,
+		Simulated:  simulated,
+	})
+}
+
 func NewClient(conf *Config) *Client {
 	return &Client{
 		Host:    Host,
