@@ -2,7 +2,7 @@ package okex
 
 import (
 	"github.com/iaping/exgo/okex/api/account"
-	"github.com/iaping/exgo/okex/api/account/subaccount"
+	"github.com/iaping/exgo/okex/api/subaccount"
 )
 
 // https://www.ouyi.fit/docs-v5/zh/#rest-api-subaccount-get-sub-account-balance
