@@ -41,4 +41,4 @@ AccountConfig() | 查看账户配置
 # 子账户
 API | 描述
 --- | ---
-AccountSubaccountBalances() | 获取子账户资产余额
+SubaccountBalances() | 获取子账户资产余额
