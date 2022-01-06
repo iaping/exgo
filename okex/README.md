@@ -9,12 +9,13 @@ import (
 )
 
 func main() {
-	ok := okex.NewClient(&okex.Config{
+	/*ok := okex.NewClient(&okex.Config{
 		APIKey:     "your APIKey",
 		SecretKey:  "your SecretKey",
 		Passphrase: "your Passphrase",
 		Simulated:  true,
-	})
+	})*/
+	ok := okex.New("your APIKey", "your SecretKey", "your Passphrase", false)
 	data, err := ok.AssetCurrencies() // api AssetCurrencies()
 	if err != nil {
 		log.Fatalln(err)
@@ -34,6 +35,8 @@ AssetBills() | 获取资金流水
 API | 描述
 --- | ---
 AccountBalance() | 查看账户余额
+AccountBills() | 账单流水查询（近七天）
+AccountConfig() | 查看账户配置
 
 # 子账户
 API | 描述
