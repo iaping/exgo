@@ -7,23 +7,20 @@ import (
 
 const CurrenciesPath = "/api/v5/asset/currencies"
 
-type CurrenciesRequest struct{}
-
-func NewCurrenciesRequest() *CurrenciesRequest {
-	return &CurrenciesRequest{}
-}
-
-func (br *CurrenciesRequest) Path() string {
-	return CurrenciesPath
-}
-
-func (br *CurrenciesRequest) Method() string {
-	return exgo.HeaderMethodGet
+func NewCurrenciesRequest() *api.CommonRequest {
+	return &api.CommonRequest{
+		Path:   CurrenciesPath,
+		Method: exgo.HeaderMethodGet,
+	}
 }
 
 type CurrenciesResponse struct {
 	api.CommonResponse
 	Data []*Currencies `json:"data"`
+}
+
+func NewCurrenciesResponse() *CurrenciesResponse {
+	return &CurrenciesResponse{}
 }
 
 type Currencies struct {

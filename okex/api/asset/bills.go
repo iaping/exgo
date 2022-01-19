@@ -7,7 +7,7 @@ import (
 
 const BillsPath = "/api/v5/asset/bills"
 
-type BillsRequest struct {
+type BillsParam struct {
 	Ccy    string `url:"ccy,omitempty"`
 	Type   int    `url:"type,omitempty"`
 	After  int64  `url:"after,omitempty"`
@@ -15,27 +15,29 @@ type BillsRequest struct {
 	Limit  int    `url:"limit,omitempty"`
 }
 
-func NewBillsRequest(ccy string, typed, limit int, after, before int64) *BillsRequest {
-	return &BillsRequest{
+func NewBillsRequest(ccy string, typed, limit int, after, before int64) *api.CommonRequest {
+	param := &BillsParam{
 		Ccy:    ccy,
 		Type:   typed,
 		After:  after,
 		Before: before,
 		Limit:  limit,
 	}
-}
 
-func (r *BillsRequest) Path() string {
-	return BillsPath
-}
-
-func (r *BillsRequest) Method() string {
-	return exgo.HeaderMethodGet
+	return &api.CommonRequest{
+		Path:   BillsPath,
+		Method: exgo.HeaderMethodGet,
+		Query:  param,
+	}
 }
 
 type BillsResponse struct {
 	api.CommonResponse
 	Data []*Bills `json:"data"`
+}
+
+func NewBillsResponse() *BillsResponse {
+	return &BillsResponse{}
 }
 
 type Bills struct {

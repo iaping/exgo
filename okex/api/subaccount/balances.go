@@ -2,22 +2,23 @@ package subaccount
 
 import (
 	"github.com/iaping/exgo"
+	"github.com/iaping/exgo/okex/api"
 )
 
 const SubaccountBalancesPath = "/api/v5/account/subaccount/balances"
 
-type SubaccountBalancesRequest struct {
+type SubaccountBalancesParam struct {
 	SubAcct string `url:"subAcct"`
 }
 
-func NewSubaccountBalancesRequest(subAcct string) *SubaccountBalancesRequest {
-	return &SubaccountBalancesRequest{SubAcct: subAcct}
-}
+func NewSubaccountBalancesRequest(subAcct string) *api.CommonRequest {
+	param := &SubaccountBalancesParam{
+		SubAcct: subAcct,
+	}
 
-func (r *SubaccountBalancesRequest) Path() string {
-	return SubaccountBalancesPath
-}
-
-func (r *SubaccountBalancesRequest) Method() string {
-	return exgo.HeaderMethodGet
+	return &api.CommonRequest{
+		Path:   SubaccountBalancesPath,
+		Method: exgo.HeaderMethodGet,
+		Query:  param,
+	}
 }

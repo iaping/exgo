@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	Host = "https://www.okex.com"
+	Host      = "https://www.okex.com"
+	HostChina = "https://www.ouyi.fit"
 )
 
 type Client struct {
@@ -20,40 +21,54 @@ type Client struct {
 	Request *fasthttp.Client
 }
 
-func New(apiKey, secretKey, passphrase string, simulated bool) *Client {
-	return NewClient(&Config{
+// new okex client
+func New(apiKey, secretKey, passphrase string, simulated, china bool) *Client {
+	cnf := &Config{
 		APIKey:     apiKey,
 		SecretKey:  secretKey,
 		Passphrase: passphrase,
 		Simulated:  simulated,
-	})
+		China:      china,
+	}
+
+	return NewClient(cnf)
 }
 
-func NewClient(conf *Config) *Client {
-	return &Client{
+// new okex client
+func NewClient(cnf *Config) *Client {
+	client := &Client{
 		Host:    Host,
-		Config:  conf,
+		Config:  cnf,
 		Request: exgo.FastHttpClient,
 	}
+
+	if cnf.China {
+		client.Host = HostChina
+	}
+
+	return client
 }
 
-// request okex api
+// request okex api and handle the response
 func (c *Client) Do(req api.Request, resp api.Response) error {
 	data, err := c.doRequest(req)
 	if err != nil {
 		return err
 	}
+
 	if err := json.Unmarshal(data, resp); err != nil {
 		return err
 	}
+
 	if !resp.IsSuccess() {
 		return fmt.Errorf("response code: %s, message: %s", resp.GetCode(), resp.GetMessage())
 	}
+
 	return nil
 }
 
 // request okex api
-func (c *Client) doRequest(r api.Request) ([]byte, error) {
+func (c *Client) doRequest(api api.Request) ([]byte, error) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer func() {
@@ -61,20 +76,22 @@ func (c *Client) doRequest(r api.Request) ([]byte, error) {
 		fasthttp.ReleaseResponse(resp)
 	}()
 
-	c.setNecessary(req, r)
+	c.handleRequest(req, c.signature(api))
+
 	if err := c.Request.Do(req, resp); err != nil {
 		return nil, err
 	}
+
 	if resp.StatusCode() != fasthttp.StatusOK {
 		return nil, fmt.Errorf("http status code:%d, desc:%s", resp.StatusCode(), string(resp.Body()))
 	}
+
 	return resp.Body(), nil
 }
 
-// okex necessary set
-func (c *Client) setNecessary(req *fasthttp.Request, r api.Request) {
-	signature := c.signature(r)
-	necessaries := map[string]string{
+// okex must set header
+func (c *Client) handleRequest(req *fasthttp.Request, signature *signature) {
+	headers := map[string]string{
 		fasthttp.HeaderContentType: exgo.HeaderContentTypeJson,
 		fasthttp.HeaderAccept:      exgo.HeaderAcceptJson,
 		HeaderAccessKey:            c.Config.APIKey,
@@ -83,33 +100,34 @@ func (c *Client) setNecessary(req *fasthttp.Request, r api.Request) {
 		HeaderAccessTimestamp:      signature.Timestamp,
 	}
 	if c.Config.Simulated {
-		necessaries[HeaderSimulatedTrading] = "1"
+		headers[HeaderSimulatedTrading] = "1"
 	}
-	for k, v := range necessaries {
+	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
 
-	req.Header.SetMethod(r.Method())
-	req.SetBodyString(signature.Body)
+	req.Header.SetMethod(signature.Method)
 	req.SetRequestURI(c.Host + signature.Path)
+
+	if signature.Body != "" {
+		req.SetBodyString(signature.Body)
+	}
 }
 
 // signature Request
-func (c *Client) signature(r api.Request) *Signature {
-	path := r.Path()
-	body := []byte("")
-	if c.isPost(r) {
-		body, _ = json.Marshal(r)
-	} else {
-		q, _ := query.Values(r)
-		if len(q) > 0 {
-			path += "?" + q.Encode()
+func (c *Client) signature(api api.Request) *signature {
+	body := []byte{}
+	if api.GetBody() != nil {
+		body, _ = json.Marshal(api.GetBody())
+	}
+
+	path := api.GetPath()
+	if api.GetQuery() != nil {
+		values, _ := query.Values(api.GetQuery())
+		if len(values) > 0 {
+			path += "?" + values.Encode()
 		}
 	}
-	return NewSignature(c.Config.SecretKey, r.Method(), path, string(body))
-}
 
-// is post request
-func (c *Client) isPost(r api.Request) bool {
-	return r.Method() == "POST"
+	return signing(c.Config.SecretKey, api.GetMethod(), path, string(body))
 }

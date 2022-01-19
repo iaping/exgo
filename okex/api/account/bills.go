@@ -7,7 +7,7 @@ import (
 
 const BillsPath = "/api/v5/account/bills"
 
-type BillsRequest struct {
+type BillsParam struct {
 	InstType string `url:"instType,omitempty"`
 	Ccy      string `url:"ccy,omitempty"`
 	MgnMode  string `url:"mgnMode,omitempty"`
@@ -19,8 +19,8 @@ type BillsRequest struct {
 	Limit    int    `url:"limit,omitempty"`
 }
 
-func NewBillsRequest(instType, ccy, mgnMode, after, before string, ctType, tp, subType, limit int) *BillsRequest {
-	return &BillsRequest{
+func NewBillsRequest(instType, ccy, mgnMode, after, before string, ctType, tp, subType, limit int) *api.CommonRequest {
+	param := &BillsParam{
 		InstType: instType,
 		Ccy:      ccy,
 		MgnMode:  mgnMode,
@@ -31,19 +31,21 @@ func NewBillsRequest(instType, ccy, mgnMode, after, before string, ctType, tp, s
 		Before:   before,
 		Limit:    limit,
 	}
-}
 
-func (br *BillsRequest) Path() string {
-	return BillsPath
-}
-
-func (br *BillsRequest) Method() string {
-	return exgo.HeaderMethodGet
+	return &api.CommonRequest{
+		Path:   BillsPath,
+		Method: exgo.HeaderMethodGet,
+		Query:  param,
+	}
 }
 
 type BillsResponse struct {
 	api.CommonResponse
 	Data []*Bills `json:"data"`
+}
+
+func NewBillsResponse() *BillsResponse {
+	return &BillsResponse{}
 }
 
 type Bills struct {

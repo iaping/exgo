@@ -7,23 +7,20 @@ import (
 
 const ConfigPath = "/api/v5/account/config"
 
-type ConfigRequest struct{}
-
-func NewConfigRequest() *ConfigRequest {
-	return &ConfigRequest{}
-}
-
-func (br *ConfigRequest) Path() string {
-	return ConfigPath
-}
-
-func (br *ConfigRequest) Method() string {
-	return exgo.HeaderMethodGet
+func NewConfigRequest() *api.CommonRequest {
+	return &api.CommonRequest{
+		Path:   ConfigPath,
+		Method: exgo.HeaderMethodGet,
+	}
 }
 
 type ConfigResponse struct {
 	api.CommonResponse
 	Data []*Config `json:"data"`
+}
+
+func NewConfigResponse() *ConfigResponse {
+	return &ConfigResponse{}
 }
 
 type Config struct {

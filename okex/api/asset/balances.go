@@ -7,27 +7,29 @@ import (
 
 const BalancesPath = "/api/v5/asset/balances"
 
-type BalancesRequest struct {
+type BalancesParam struct {
 	Ccy string `url:"ccy,omitempty"`
 }
 
-func NewBalancesRequest(ccy string) *BalancesRequest {
-	return &BalancesRequest{
+func NewBalancesRequest(ccy string) *api.CommonRequest {
+	param := &BalancesParam{
 		Ccy: ccy,
 	}
-}
 
-func (r *BalancesRequest) Path() string {
-	return BalancesPath
-}
-
-func (r *BalancesRequest) Method() string {
-	return exgo.HeaderMethodGet
+	return &api.CommonRequest{
+		Path:   BalancesPath,
+		Method: exgo.HeaderMethodGet,
+		Query:  param,
+	}
 }
 
 type BalancesResponse struct {
 	api.CommonResponse
 	Data []*Balances `json:"data"`
+}
+
+func NewBalancesResponse() *BalancesResponse {
+	return &BalancesResponse{}
 }
 
 type Balances struct {

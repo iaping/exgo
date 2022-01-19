@@ -1,8 +1,6 @@
 package okex
 
 type Config struct {
-	APIKey     string
-	SecretKey  string
-	Passphrase string
-	Simulated  bool
+	APIKey, SecretKey, Passphrase string
+	Simulated, China              bool
 }

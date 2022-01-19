@@ -7,25 +7,29 @@ import (
 
 const BalancePath = "/api/v5/account/balance"
 
-type BalanceRequest struct {
+type BalanceParam struct {
 	Ccy string `url:"ccy"`
 }
 
-func NewBalanceRequest(ccy string) *BalanceRequest {
-	return &BalanceRequest{Ccy: ccy}
-}
+func NewBalanceRequest(ccy string) *api.CommonRequest {
+	param := &BalanceParam{
+		Ccy: ccy,
+	}
 
-func (br *BalanceRequest) Path() string {
-	return BalancePath
-}
-
-func (br *BalanceRequest) Method() string {
-	return exgo.HeaderMethodGet
+	return &api.CommonRequest{
+		Path:   BalancePath,
+		Method: exgo.HeaderMethodGet,
+		Query:  param,
+	}
 }
 
 type BalanceResponse struct {
 	api.CommonResponse
 	Data []*Balance `json:"data"`
+}
+
+func NewBalanceResponse() *BalanceResponse {
+	return &BalanceResponse{}
 }
 
 type Balance struct {
