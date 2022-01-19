@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	Host = "https://www.ouyi.fit"
+	Host = "https://www.okex.com"
 )
 
 type Client struct {
