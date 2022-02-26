@@ -33,3 +33,15 @@ func (c *Client) AccountConfig() ([]*account.Config, error) {
 	}
 	return resp.Data, nil
 }
+
+// https://www.okx.com/docs-v5/zh/#rest-api-account-get-positions
+func (c *Client) AccountPositions(param *account.PositionsParam) ([]*account.Positions, error) {
+	req := account.NewPositionsRequest(param)
+	resp := account.NewPositionsResponse()
+
+	if err := c.Do(req, resp); err != nil {
+		return nil, err
+	}
+
+	return resp.Data, nil
+}
