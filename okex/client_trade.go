@@ -27,3 +27,15 @@ func (c *Client) TradeOrderDetail(param *trade.OrderDetailParam) ([]*trade.Order
 
 	return resp.Data, nil
 }
+
+// https://www.okx.com/docs-v5/zh/#rest-api-trade-place-algo-order
+func (c *Client) TradeOrderAlgo(param *trade.OrderAlgoParam) ([]*trade.OrderAlgo, error) {
+	req := trade.NewOrderAlgoRequest(param)
+	resp := trade.NewOrderAlgoResponse()
+
+	if err := c.Do(req, resp); err != nil {
+		return nil, err
+	}
+
+	return resp.Data, nil
+}
