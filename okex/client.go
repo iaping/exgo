@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	Host      = "https://www.okex.com"
+	Host      = "https://www.okx.com"
 	HostChina = "https://www.ouyi.fit"
 )
 
