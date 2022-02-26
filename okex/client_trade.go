@@ -17,8 +17,8 @@ func (c *Client) TradeOrder(param *trade.OrderParam) ([]*trade.Order, error) {
 }
 
 // https://www.okx.com/docs-v5/zh/#rest-api-trade-get-order-details
-func (c *Client) TradeOrderDetail(instId, ordId, clOrdId string) ([]*trade.OrderDetail, error) {
-	req := trade.NewOrderDetailRequest(instId, ordId, clOrdId)
+func (c *Client) TradeOrderDetail(param *trade.OrderDetailParam) ([]*trade.OrderDetail, error) {
+	req := trade.NewOrderDetailRequest(param)
 	resp := trade.NewOrderDetailResponse()
 
 	if err := c.Do(req, resp); err != nil {
