@@ -45,3 +45,15 @@ func (c *Client) AccountPositions(param *account.PositionsParam) ([]*account.Pos
 
 	return resp.Data, nil
 }
+
+// https://www.okx.com/docs-v5/zh/#rest-api-account-get-maximum-buy-sell-amount-or-open-amount
+func (c *Client) AccountMaxSize(param *account.MaxSizeParam) ([]*account.MaxSize, error) {
+	req := account.NewMaxSizeRequest(param)
+	resp := account.NewMaxSizeResponse()
+
+	if err := c.Do(req, resp); err != nil {
+		return nil, err
+	}
+
+	return resp.Data, nil
+}
