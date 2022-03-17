@@ -57,3 +57,15 @@ func (c *Client) AccountMaxSize(param *account.MaxSizeParam) ([]*account.MaxSize
 
 	return resp.Data, nil
 }
+
+// https://www.okx.com/docs-v5/zh/#rest-api-account-set-leverage
+func (c *Client) AccountSetLeverage(param *account.SetLeverageParam) ([]*account.SetLeverage, error) {
+	req := account.NewSetLeverageRequest(param)
+	resp := account.NewSetLeverageResponse()
+
+	if err := c.Do(req, resp); err != nil {
+		return nil, err
+	}
+
+	return resp.Data, nil
+}
